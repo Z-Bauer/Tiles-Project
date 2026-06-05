@@ -61,7 +61,7 @@ pip install pygame
 ```
 Run the game
 ```bash
-python main.py
+python Tiles-Test.py
 ```
 
 ## Project Status
