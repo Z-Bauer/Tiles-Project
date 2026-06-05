@@ -52,7 +52,7 @@ Key modules:
 Clone the repository
 ```bash
 git clone https://github.com/Z-Bauer/Tiles-Project
-cd tile-shift
+cd Tiles-Project
 ```
 
 Install dependencies
@@ -66,7 +66,7 @@ python main.py
 
 ## Project Status
 
-Sprint 1 in progress. See our [JIRA board](paste-linke) for current tasks and backlog.
+Sprint 1 in progress. See our [JIRA board](https://cis-project-350-tiles-table.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog?atlOrigin=eyJpIjoiNzAyODU1NTE3OGRlNGNiYzhlODg4ODA0N2UzZjAwNGEiLCJwIjoiaiJ9) for current tasks and backlog.
 
 ## Team
 
