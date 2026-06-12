@@ -198,6 +198,13 @@ while active:
 
     clock.tick(60)
 
+while True:
+    for event in pygame.event.get():
+        # Quits the game when window is closed
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
     
 
 
