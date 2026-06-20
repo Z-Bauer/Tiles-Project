@@ -47,6 +47,20 @@ Key modules:
 * **Input handler** — moves the blank space and resolves player/enemy collisions on spacebar
 * **Enemy spawner** — timer-based system that places enemies at random tiles, with spawn rate increasing over time
 
+## Diagrams
+
+### Use Case Diagram
+
+![Use Case Diagram](./diagrams/UseCaseDiagram.png)
+
+### Class Diagram
+
+![Class Diagram](./diagrams/ClassDiagram.png)
+
+### Communication Diagram
+
+![Communication Diagram](./diagrams/CommunicationDiagram.png)
+
 ## Setup & Installation
 
 Clone the repository
@@ -66,7 +80,7 @@ python Tiles-Test.py
 
 ## Project Status
 
-Sprint 1 in progress. See our [JIRA board](https://cis-project-350-tiles-table.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog?atlOrigin=eyJpIjoiNzAyODU1NTE3OGRlNGNiYzhlODg4ODA0N2UzZjAwNGEiLCJwIjoiaiJ9) for current tasks and backlog.
+Sprint 3 in progress. See our [JIRA board](https://cis-project-350-tiles-table.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog?atlOrigin=eyJpIjoiNzAyODU1NTE3OGRlNGNiYzhlODg4ODA0N2UzZjAwNGEiLCJwIjoiaiJ9) for current tasks and backlog.
 
 ## Team
 
