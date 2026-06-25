@@ -29,8 +29,11 @@ most_recent = ['', '']
 score = 0
 level = 1
 to_next_level = 10
+highscore = 0
 
-my_font = pygame.font.SysFont('Times New Roman', 18)
+my_font = pygame.font.SysFont('Bauhaus93', 25)
+title_font = pygame.font.SysFont('Bauhaus93', 100)
+enter_font = pygame.font.SysFont('Bauhaus93', 35)
 score_surface = my_font.render(str(score), False, (0, 0, 0))
 
 class Tile:
@@ -41,23 +44,82 @@ class Tile:
         self.y = y
         self.container = container
 
+class Slide:
+
+    def __init__(self, x1, y1, x2, y2, x3, y3):
+        self.coord_1 = [x1, y1]
+        self.coord_2 = [x2, y2]
+        self.coord_3 = [x3, y3]
+
+    def move(self, amount):
+        self.coord_1[0] += amount
+        self.coord_1[1] += amount
+        self.coord_2[0] += amount
+        self.coord_2[1] += amount
+        self.coord_3[0] += amount
+        self.coord_3[1] += amount
+
 # Title Screen -- waiting for ENTER to be pressed
-screen.fill((255, 255, 255))
-waiting = True
-while waiting:
+def wait_screen():
     screen.fill((255, 255, 255))
-    pygame.display.flip()
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RETURN:
-                waiting = False
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
+    title_timer = 0
+    title1x = -60
+    title2x = 330
+    for i in range(10):
+        screen.fill((255, 255, 255))
+        title_surface1 = title_font.render("TILE", True, (0, 0, 0))
+        title_surface2 = title_font.render("SHIFT", True, (0, 0, 0))
+        screen.blit(title_surface1, (title1x, 40))
+        screen.blit(title_surface2, (title2x, 120))
+        title1x += 10
+        title2x -= 10
+        pygame.display.flip()
+        clock.tick(60)
+    waiting = True
+    while waiting:
+        screen.fill((255, 255, 255))
+        title_surface1 = title_font.render("TILE", True, (0, 0, 0))
+        title_surface2 = title_font.render("SHIFT", True, (0, 0, 0))
+        title_surface3 = enter_font.render("-- press ENTER to start --", True, (0, 0, 0))
+        screen.blit(title_surface1, (40, 40))
+        screen.blit(title_surface2, (230, 120))
+        title_timer += 1
+        if title_timer <= 30:
+            screen.blit(title_surface3, (75, 450))
+        if title_timer >= 60:
+            title_timer = 0
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    waiting = False
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        clock.tick(60)
+
+SE_Slide = Slide(-300, -300, -300, 300, 200, -300)
+NW_Slide = Slide(800, 300, 800, 900, 300, 900)
+
+def screen_close():
+    SE_Slide = Slide(-300, -300, -300, 300, 200, -300)
+    NW_Slide = Slide(800, 300, 800, 900, 300, 900)
+    #pygame.time.wait(1200)
+    for x in range(13):
+        pygame.draw.polygon(screen, (255, 255, 255), [SE_Slide.coord_1, SE_Slide.coord_2, SE_Slide.coord_3])
+        pygame.draw.polygon(screen, (255, 255, 255), [NW_Slide.coord_1, NW_Slide.coord_2, NW_Slide.coord_3])
+        NW_Slide.move(int(-25))
+        SE_Slide.move(int(25))
+        pygame.display.flip()
+        clock.tick(60)
 
 external_active = True
 while external_active:
 
+    wait_screen()
+
+    screen_close()
+    
     print("LOOP START")
     screen.fill((255, 255, 255))
     pygame.display.flip()
@@ -107,6 +169,15 @@ while external_active:
                 pygame.draw.rect(screen, (235, 64, 52), tile.hitbox)
         pygame.display.flip()
 
+    def screen_open():
+        for x in range(13):
+            pygame.draw.polygon(screen, (255, 255, 255), [SE_Slide.coord_1, SE_Slide.coord_2, SE_Slide.coord_3])
+            pygame.draw.polygon(screen, (255, 255, 255), [NW_Slide.coord_1, NW_Slide.coord_2, NW_Slide.coord_3])
+            NW_Slide.move(int(25))
+            SE_Slide.move(int(-25))
+            pygame.display.flip()
+            clock.tick(60)
+        
     enemy_timer = 0
     enemy_wait_time = 3000
     enemy_min_time = 1200
@@ -202,6 +273,8 @@ while external_active:
         if enemy_count >= 13:
             print("YOU LOSE!")
             print("Final Score:", score)
+            if highscore <= score:
+                highscore = score
             active = False
                 
 
@@ -224,14 +297,36 @@ while external_active:
         
         screen.fill((255, 255, 255))
 
-        score_surface = my_font.render(str(score), False, (0, 0, 0))
-        level_surface = my_font.render(str(level), False, (0, 0, 0))
-        screen.blit(score_surface, (0,0))
-        screen.blit(level_surface, (0, 25))
+        score_text = "SCORE: " + str(score)
+        level_text = "LEVEL: " + str(level)
+
+        score_surface = my_font.render(score_text, True, (0, 0, 0))
+        level_surface = my_font.render(level_text, True, (0, 0, 0))
+        screen.blit(score_surface, (25, 25))
+        screen.blit(level_surface, (25, 60))
 
         tile_update()
-
+        
         clock.tick(60)
+
+    pygame.time.wait(1200)
+
+    screen_close()
+
+    pygame.time.wait(1000)
+    
+    final_score = "FINAL SCORE: " + str(score)
+    high_score = "HIGH SCORE: " + str(highscore)
+    
+    final_score_width, final_score_height = my_font.size(final_score)
+    final_score_surface = my_font.render(final_score, True, (0, 0, 0))
+    high_score_width, high_score_height = my_font.size(high_score)
+    high_score_surface = my_font.render(high_score, True, (0, 0, 0))
+    screen.blit(final_score_surface, (((500 - final_score_width) / 2), 150))
+    pygame.display.flip()
+    pygame.time.wait(1000)
+    screen.blit(high_score_surface, (((500 - high_score_width) / 2), 300))
+    pygame.display.flip()
 
     waiting_for_restart = True
     while waiting_for_restart:
@@ -242,7 +337,6 @@ while external_active:
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    print("hello")
                     waiting_for_restart = False
 
     
