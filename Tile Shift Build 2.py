@@ -1,8 +1,9 @@
+# Import libraries
 import pygame
 import sys
 import random
 
-# create screen
+# Create screen
 pygame.init()
 pygame.font.init()
 screen_width = 500
@@ -29,13 +30,23 @@ most_recent = ['', '']
 score = 0
 level = 1
 to_next_level = 10
-highscore = 0
+try:
+    # Look at 'highscore' file, read highscore
+    with open("highscore.txt") as f:
+        highscore = int(f.read())
+except:
+    # If no 'highscore' file exists, create one and save first score as 0
+    f = open("highscore.txt", "w")
+    f.write("0")
+    highscore = 0
 
+# Initialize fonts
 my_font = pygame.font.SysFont('Bauhaus93', 25)
 title_font = pygame.font.SysFont('Bauhaus93', 100)
 enter_font = pygame.font.SysFont('Bauhaus93', 35)
 score_surface = my_font.render(str(score), False, (0, 0, 0))
 
+# Class definitions
 class Tile:
 
     def __init__(self, hitbox, x, y, container):
@@ -66,6 +77,7 @@ def wait_screen():
     title1x = -60
     title2x = 330
     for i in range(10):
+        # Title screen animation
         screen.fill((255, 255, 255))
         title_surface1 = title_font.render("TILE", True, (0, 0, 0))
         title_surface2 = title_font.render("SHIFT", True, (0, 0, 0))
@@ -77,12 +89,14 @@ def wait_screen():
         clock.tick(60)
     waiting = True
     while waiting:
+        # Blinking ENTER button
         screen.fill((255, 255, 255))
         title_surface1 = title_font.render("TILE", True, (0, 0, 0))
         title_surface2 = title_font.render("SHIFT", True, (0, 0, 0))
         title_surface3 = enter_font.render("-- press ENTER to start --", True, (0, 0, 0))
         screen.blit(title_surface1, (40, 40))
         screen.blit(title_surface2, (230, 120))
+        # Timing for ENTER button, blinks on and off every second or so
         title_timer += 1
         if title_timer <= 30:
             screen.blit(title_surface3, (75, 450))
@@ -98,13 +112,15 @@ def wait_screen():
                 sys.exit()
         clock.tick(60)
 
+# Initialize two halves of 'sliding' animation
+# (Coords are built to take up exactly half of the screen)
 SE_Slide = Slide(-300, -300, -300, 300, 200, -300)
 NW_Slide = Slide(800, 300, 800, 900, 300, 900)
 
+# Function for screen transitions
 def screen_close():
     SE_Slide = Slide(-300, -300, -300, 300, 200, -300)
     NW_Slide = Slide(800, 300, 800, 900, 300, 900)
-    #pygame.time.wait(1200)
     for x in range(13):
         pygame.draw.polygon(screen, (255, 255, 255), [SE_Slide.coord_1, SE_Slide.coord_2, SE_Slide.coord_3])
         pygame.draw.polygon(screen, (255, 255, 255), [NW_Slide.coord_1, NW_Slide.coord_2, NW_Slide.coord_3])
@@ -113,28 +129,61 @@ def screen_close():
         pygame.display.flip()
         clock.tick(60)
 
+# Credits
+for x in range(200):
+    screen.fill((0, 0, 0))
+    
+    credits_width, credits_height = enter_font.size("A GAME BY:")
+    zach_width, zach_height = enter_font.size("Zachary Bauer")
+    sam_width, sam_height = enter_font.size("Sam Sikorski")
+    will_width, will_height = enter_font.size("William Wen")
+    
+    credits_surface = enter_font.render("A GAME BY:", True, (255, 255, 255))
+    zach_surface = enter_font.render("Zachary Bauer", True, (255, 255, 255))
+    sam_surface = enter_font.render("Sam Sikorski", True, (255, 255, 255))
+    will_surface = enter_font.render("William Wen", True, (255, 255, 255))
+    
+    screen.blit(credits_surface, (((500 - credits_width) / 2), 200))
+    screen.blit(zach_surface, (((500 - zach_width) / 2), 250))
+    screen.blit(sam_surface, (((500 - sam_width) / 2), 300))
+    screen.blit(will_surface, (((500 - will_width) / 2), 350))
+    
+    pygame.display.flip()
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+    
+    clock.tick(60)
+    
+screen_close()
+
+# Beginning of EXTERNAL LOOP
 external_active = True
 while external_active:
 
+    # Loop until ENTER is pressed
     wait_screen()
 
+    # Screen transition
     screen_close()
     
-    print("LOOP START")
     screen.fill((255, 255, 255))
     pygame.display.flip()
 
-    # Reset Score
+    # Reset SCORE
     score = 0
     level = 1
     to_next_level = 10
     
-    # Generate tiles
+    # Generate empty list of tiles
     x = 0
     y = 0
     tiles = []
     most_recent = ['', '']
-    
+
+    # Generate all tiles
     for i in range(tile_rows):
         y = 0
         x += 1
@@ -156,7 +205,7 @@ while external_active:
             if tile.x == 3 and tile.y == 2:
                 tile.container = "player"
 
-    # Update the board based on tile position
+    # Function to update the board based on tile position
     def tile_update():
         for tile in tiles:
             if tile.container == "blank":
@@ -177,14 +226,15 @@ while external_active:
             SE_Slide.move(int(-25))
             pygame.display.flip()
             clock.tick(60)
-        
+
+    # Timer for enemy spawning    
     enemy_timer = 0
     enemy_wait_time = 3000
     enemy_min_time = 1200
 
     active = True
 
-    # MAIN GAME LOOP
+    # Beginning of MAIN GAME LOOP
     while active:
         for event in pygame.event.get():
             # Quits the game when window is closed
@@ -253,12 +303,9 @@ while external_active:
                         if tile.x == most_recent[0] and tile.y == most_recent[1]:
                             if tile.container == "enemy":
                                 score += 1
-                                print("Score:", score)
                                 # LEVEL UP! Enemies start to get faster! 
                                 if score >= to_next_level:
                                     level += 1
-                                    print("LEVEL UP!")
-                                    print("Level", level)
                                     to_next_level = to_next_level + (5 * level)
                                     if enemy_min_time > 300:
                                         enemy_min_time -= 100
@@ -271,10 +318,13 @@ while external_active:
             if tile.container == "enemy":
                 enemy_count += 1
         if enemy_count >= 13:
-            print("YOU LOSE!")
-            print("Final Score:", score)
+            # If the score is bigger than highscore, change highscore
             if highscore <= score:
                 highscore = score
+                # Change value of highscore file
+                with open("highscore.txt", "w") as f:
+                    f.write(str(highscore))
+            # End internal MAIN
             active = False
                 
 
@@ -297,39 +347,80 @@ while external_active:
         
         screen.fill((255, 255, 255))
 
+        # Create stat text
         score_text = "SCORE: " + str(score)
         level_text = "LEVEL: " + str(level)
+        enemies_text = "ENEMIES:"
+        enemies_number = str(enemy_count)
 
+        # Display stat text at top of screen
         score_surface = my_font.render(score_text, True, (0, 0, 0))
         level_surface = my_font.render(level_text, True, (0, 0, 0))
+        enemies_surface = my_font.render(enemies_text, True, (0, 0, 0))
+        if enemy_count < 10:
+            enemies_number_surface = my_font.render(enemies_number, True, (0, 0, 0))
+        else:
+            enemies_number_surface = my_font.render(enemies_number, True, (235, 64, 52))
+
+        # Push all text to screen
         screen.blit(score_surface, (25, 25))
         screen.blit(level_surface, (25, 60))
+        screen.blit(enemies_surface, (370, 25))
+        screen.blit(enemies_number_surface, (370, 60))
 
+        # Display tiles, update screen
         tile_update()
-        
+
+        # Frame tick
         clock.tick(60)
 
     pygame.time.wait(1200)
 
+    # Screen transition
     screen_close()
 
     pygame.time.wait(1000)
-    
+
+    # Create strings for FINAL SCORE and HIGH SCORE
     final_score = "FINAL SCORE: " + str(score)
     high_score = "HIGH SCORE: " + str(highscore)
-    
+
+    # Display ending text, with a second-long buffer between each one
+    # Get width of each text box, in order to center it regardless of number length
     final_score_width, final_score_height = my_font.size(final_score)
     final_score_surface = my_font.render(final_score, True, (0, 0, 0))
     high_score_width, high_score_height = my_font.size(high_score)
     high_score_surface = my_font.render(high_score, True, (0, 0, 0))
-    screen.blit(final_score_surface, (((500 - final_score_width) / 2), 150))
+    restart_width, restart_height = my_font.size("- press ENTER to restart -")
+    screen.blit(final_score_surface, (((500 - final_score_width) / 2), 135))
     pygame.display.flip()
     pygame.time.wait(1000)
-    screen.blit(high_score_surface, (((500 - high_score_width) / 2), 300))
+    screen.blit(high_score_surface, (((500 - high_score_width) / 2), 270))
+    pygame.display.flip()
+    pygame.time.wait(1000)
+    restart_surface = my_font.render("- press ENTER to restart -", True, (0, 0, 0))
+    screen.blit(restart_surface, (((500 - restart_width) / 2), 405))
+    # Update screen
     pygame.display.flip()
 
     waiting_for_restart = True
+    restart_timer = 0
     while waiting_for_restart:
+
+        screen.fill((255, 255, 255))
+        final_score_surface = my_font.render(final_score, True, (0, 0, 0))
+        high_score_surface = my_font.render(high_score, True, (0, 0, 0))
+        screen.blit(final_score_surface, (((500 - final_score_width) / 2), 135))
+        screen.blit(high_score_surface, (((500 - high_score_width) / 2), 270))
+        restart_surface = my_font.render("- press ENTER to restart -", True, (0, 0, 0))
+        if restart_timer <= 30:
+            screen.blit(restart_surface, (((500 - restart_width) / 2), 405))
+        if restart_timer == 60:
+            restart_timer = 0
+        # Update screen
+        pygame.display.flip()
+        restart_timer += 1
+        
         for event in pygame.event.get():
             # Quits the game when window is closed
             if event.type == pygame.QUIT:
@@ -338,6 +429,7 @@ while external_active:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     waiting_for_restart = False
+        clock.tick(60)
 
     
 
