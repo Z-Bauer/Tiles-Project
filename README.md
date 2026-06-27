@@ -86,6 +86,8 @@ Key modules:
 
 ### Option 1 — Run the executable
 
+Download the Tile Shift folder, extract the zip file, then run the executable.
+
 ### Option 2 — Run from source
 
 Clone the repository
