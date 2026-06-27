@@ -41,6 +41,9 @@ class Tile:
         self.y = y
         self.container = container
 
+waiting = True
+
+
 # Generate tiles
 x = 0
 y = 0
